@@ -1,24 +1,24 @@
-# @manyducks.co/stator
+# @manyducks.co/hookshot
 
-At some point in the life of every React developer comes the question, "How do I share one hook's state between multiple components?" Stator makes this simple.
+Hookshot is a simple state management library for React that makes it easy to share state between components.
 
 ## Installation
 
 ```bash
-npm install @manyducks.co/stator
+npm install @manyducks.co/hookshot
 ```
 
-## Example: Counter Store
+## Example: Counter
 
 ```tsx
-import { createStore } from "@manyducks.co/stator";
+import { createStore } from "@manyducks.co/hookshot";
 import { useState, useCallback } from "react";
 
 type CounterOptions = {
   initialValue?: number;
 };
 
-// Write your hook code, pass it to `createStore`, get a Provider and a hook.
+// Define a store; get a provider and a dedicated hook.
 
 const [CounterProvider, useCounter] = createStore((options: CounterOptions) => {
   const [value, setValue] = useState(options.initialValue ?? 0);
@@ -46,8 +46,7 @@ const [CounterProvider, useCounter] = createStore((options: CounterOptions) => {
 function MyApp() {
   return (
     // One instance of your store is created wherever you render the provider.
-    // You can render multiple `<CounterProvider>`s in different parts of your app,
-    // and each one maintains its own isolated state.
+    // Multiple `<CounterProvider>`s in different parts of your app will each maintain their own state.
     <CounterProvider options={{ initialValue: 51 }}>
       <CounterDisplay />
       <CounterControls />
@@ -56,7 +55,7 @@ function MyApp() {
 }
 
 function CounterDisplay() {
-  // All children can access the same instance via the hook.
+  // All children can access the shared state with the dedicated hook.
   // TypeScript will automatically infer the correct return types here.
   const { value } = useCounter();
 
@@ -64,6 +63,8 @@ function CounterDisplay() {
 }
 
 function CounterControls() {
+  // Same instance of the counter store.
+  // These functions will alter the value that CounterDisplay sees.
   const { increment, decrement, reset } = useCounter();
 
   return (
@@ -78,14 +79,14 @@ function CounterControls() {
 
 ## Optimizing with a selector
 
-It's typical to only need part of a store's state. A component that calls `useCounter` will render every time the store state changes, even if it's not using the part of the state that changed. You can pass a selector function to pluck out the parts you care about so your component will only render when you need it to.
+It's typical to only need part of the state. A component that calls `useCounter` will render every time the store renders, even if it's not using the part of the state that changed. You can pass a selector function to pluck only what you care about so your component will render just when you need it to.
 
-Let's optimize the Counter components.
+Let's optimize the components.
 
 ```tsx
 function CounterDisplay() {
   const value = useCounter((state) => state.value);
-  // We only care about the value.
+  // We select only the value to display.
   // If we add more state to the counter store later, this component won't even notice.
 
   return <p>Count is: {value}</p>;
@@ -97,8 +98,8 @@ function CounterControls() {
     state.decrement,
     state.reset,
   ]);
-  // We don't care about the value, only the functions to modify it.
-  // Because we've wrapped them in `useCallback` they will always reference the same functions.
+  // We don't care about the value here, only the functions to modify it.
+  // Because we've wrapped them in `useCallback` their references will remain stable.
   // Changes to the counter value will never cause this component to render.
 
   return (
@@ -111,15 +112,10 @@ function CounterControls() {
 }
 ```
 
-> [!NOTE]
-> The hook performs a shallow check on the selected value that treats arrays or objects with equivalent keys and values as equal.
-> A selector may return an array or object with multiple values (like in our CounterControls example above).
-> In this case the return value is just a container. It's the items _inside_ the array that are compared for equality.
-
 ### Memoize everything
 
 > [!IMPORTANT]
-> Because Stator relies on referential equality when comparing selected state, you must memoize any selected functions and derived objects returned by your base hook.
+> Because Hookshot relies on referential equality when comparing selected state, you must memoize any selected functions and derived objects returned by your hook.
 
 If you return a new function or object reference on every render, components selecting those values will also re-render every time, defeating the selector optimization.
 
@@ -135,8 +131,8 @@ const increment = useCallback((amount = 1) => {
 
 ## Prior art
 
-We have been long time users of the great [unstated-next](https://github.com/jamiebuilds/unstated-next). Stator was created to add memoization and an improved API on top of that same idea.
+We have been long time users of the great [unstated-next](https://github.com/jamiebuilds/unstated-next). Hookshot was created to add memoization and an improved API on top of that same idea.
 
 ## License
 
-Stator is provided under the MIT license.
+This code is provided under the MIT license.

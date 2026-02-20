@@ -7,9 +7,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, "src/stator.ts"),
-      name: "Stator",
-      fileName: "stator",
+      entry: resolve(__dirname, "src/main.ts"),
+      name: "Skyhook",
+      fileName: "main",
       formats: ["es"],
     },
     rollupOptions: {

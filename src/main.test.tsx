@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, renderHook } from "@testing-library/react";
 import { useCallback, useState } from "react";
 import { afterEach, expect, test, vi } from "vitest";
-import { createStore } from "./stator.js";
+import { createStore } from "./main.js";
 
 type TestStoreOptions = { initialCount?: number; initialText?: string };
 
@@ -26,7 +26,7 @@ test("throws when hook is used outside of provider", () => {
   const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
   expect(() => renderHook(() => useTestStore())).toThrow(
-    "Component must be wrapped with a store <Provider>",
+    "Component must be wrapped with a <Provider>",
   );
 
   consoleError.mockRestore();

@@ -1,5 +1,5 @@
 {
-  "name": "@manyducks.co/stator",
+  "name": "@manyducks.co/hookshot",
   "description": "Memoized context stores for React",
   "version": "1.0.0",
   "sideEffects": false,
@@ -7,14 +7,14 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/manyducksco/stator.git"
+    "url": "git+https://github.com/manyducksco/hookshot.git"
   },
-  "main": "dist/stator.js",
-  "types": "dist/stator.d.ts",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/stator.d.ts",
-      "import": "./dist/stator.js"
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.js"
     }
   },
   "scripts": {

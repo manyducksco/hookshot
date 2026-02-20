@@ -26,7 +26,7 @@ export type ProviderProps<F extends (...args: any) => any> =
         { options: Parameters<F>[0]; children: React.ReactNode };
 
 /**
- * Provides a single instance of a store to all its children.
+ * Provides a single instance to all its children.
  */
 export type StoreProvider<F extends (...args: any) => any> =
   React.ComponentType<ProviderProps<F>>;
@@ -37,7 +37,7 @@ export type StoreProvider<F extends (...args: any) => any> =
 export type Selector<Value, Selected> = (value: Value) => Selected;
 
 /**
- * Accesses the nearest parent instance of a store.
+ * Accesses the nearest parent instance.
  */
 export interface StoreHook<Value> {
   (): Value;
@@ -68,9 +68,6 @@ class Store<T> {
   get = () => this.value;
 }
 
-/**
- * Defines a new store, returning its provider and hook.
- */
 export function createStore<F extends (...args: any) => any>(
   fn: F,
 ): [StoreProvider<F>, StoreHook<ReturnType<F>>] {
@@ -101,7 +98,7 @@ export function createStore<F extends (...args: any) => any>(
     const store = useContext(Context);
 
     if (store === EMPTY) {
-      throw new Error("Component must be wrapped with a store <Provider>");
+      throw new Error("Component must be wrapped with a <Provider>");
     }
 
     const snapshotRef = useRef<{ root: Value; selected: Selected } | null>(
