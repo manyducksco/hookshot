@@ -1,6 +1,6 @@
 # @manyducks.co/stator
 
-Stator answers the question, "How do I share one hook's state between multiple components?" Stator makes this simple.
+At some point in the life of every React developer comes the question, "How do I share one hook's state between multiple components?" Stator makes this simple.
 
 ## Installation
 
