@@ -9,31 +9,27 @@ import {
 
 const EMPTY: unique symbol = Symbol();
 
-export interface StoreProviderProps<Options> {
-  options?: Options;
-  children: React.ReactNode;
-}
-
-export interface StoreProviderPropsWithOptions<
-  Options,
-> extends StoreProviderProps<Options> {
-  options: Options;
-}
+/**
+ * Infers the correct Provider props based on the hook's arguments.
+ * - No arguments       -> { children }
+ * - Required argument  -> { options: Options, children }
+ * - Optional argument  -> { options?: Options, children }
+ */
+export type ProviderProps<F extends (...args: any) => any> =
+  // 1. If it takes exactly 0 arguments
+  Parameters<F> extends []
+    ? { children: React.ReactNode }
+    : // 2. If an empty tuple is assignable to the parameters, the argument is optional
+      [] extends Parameters<F>
+      ? { options?: Parameters<F>[0]; children: React.ReactNode }
+      : // 3. Otherwise, the argument is required
+        { options: Parameters<F>[0]; children: React.ReactNode };
 
 /**
  * Provides a single instance of a store to all its children.
  */
-export type StoreProvider<Options> = React.ComponentType<
-  StoreProviderProps<Options>
->;
-
-/**
- * Provides a single instance of a store to all its children.
- * Store options are passed as props.
- */
-export type StoreProviderWithOptions<Options> = React.ComponentType<
-  StoreProviderPropsWithOptions<Options>
->;
+export type StoreProvider<F extends (...args: any) => any> =
+  React.ComponentType<ProviderProps<F>>;
 
 /**
  * Plucks only the parts of the state this component cares about.
@@ -75,33 +71,14 @@ class Store<T> {
 /**
  * Defines a new store, returning its provider and hook.
  */
-export function createStore<Value>(
-  fn: () => Value,
-): [StoreProvider<undefined>, StoreHook<Value>];
-
-/**
- * Defines a new store, returning its provider and hook.
- */
-export function createStore<Value, Options>(
-  fn: (options: Options) => Value,
-): [StoreProviderWithOptions<Options>, StoreHook<Value>];
-
-/**
- * Defines a new store, returning its provider and hook.
- */
-export function createStore<Value, Options>(
-  fn: (options?: Options) => Value,
-): [StoreProviderWithOptions<Options | undefined>, StoreHook<Value>];
-
-export function createStore<Value, Options>(
-  fn: (options?: Options) => Value,
-):
-  | [StoreProvider<Options>, StoreHook<Value>]
-  | [StoreProviderWithOptions<Options>, StoreHook<Value>] {
+export function createStore<F extends (...args: any) => any>(
+  fn: F,
+): [StoreProvider<F>, StoreHook<ReturnType<F>>] {
+  type Value = ReturnType<F>;
   const Context = createContext<Store<Value> | typeof EMPTY>(EMPTY);
 
-  function Provider(props: StoreProviderProps<Options>) {
-    const value = fn(props.options);
+  function Provider(props: ProviderProps<F>) {
+    const value = fn((props as any).options);
     const storeRef = useRef<Store<Value>>(null);
 
     if (!storeRef.current) {

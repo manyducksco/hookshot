@@ -1,7 +1,7 @@
 {
   "name": "@manyducks.co/stator",
   "description": "Memoized context stores for React",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "sideEffects": false,
   "author": "tony@manyducks.co",
   "type": "module",
